@@ -45,8 +45,8 @@
 
 07) Editing the First App : 
 - For importing FormsModule in app.module.ts
-
-<!-- import { NgModule } from '@angular/core';
+```
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 
@@ -63,11 +63,14 @@ import { AppComponent } from './app.component';
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { } -->
+export class AppModule { }
+```
 
 - In app.component.html :
-<!-- <input type="text" [(ngModel)]="name">
-<p>{{ name }}</p> -->
+```
+<input type="text" [(ngModel)]="name">
+<p>{{ name }}</p>
+```
 
 08) The Course Structure : 
 - Getting Started
@@ -102,13 +105,17 @@ export class AppModule { } -->
 12) A Basic Project Setup Using Bootstrap For Styling :
 - For installing bootstrap for the project : npm i --save bootstrap@3
 - Add following code in angular.json inside build :
-<!-- "styles": [
+```
+"styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/styles.css"
-            ], -->
+            ],
+```
 - You can see the following text just to confirm whether bootstrap is loaded or not.
 - You can go to the developers tool and check for styles.css
-<!-- Bootstrap v3.4.1 (https://getbootstrap.com/) -->
+```
+Bootstrap v3.4.1 (https://getbootstrap.com/)
+```
 
 13) About the Course Code / Code Snapshots:
 - Strict mode forces you to write more verbose code in some places (especially when it comes to class properties). 
