@@ -1,12 +1,12 @@
-01) Course Introduction :
+### 01) Course Introduction :
 
-02) What is Angular? :
+### 02) What is Angular? :
 - Angular is a JavaScript Framework which allows you to create reactive Single-Page-Applications (SPAs).
 - JavaScript changes the DOM, changes whatever is displayed in the browser, by changing the HTML code during runtime.
 
-03) Join our Online Learning Community :
+### 03) Join our Online Learning Community :
 
-04) Angular vs Angular 2 vs Latest Angular Version :
+### 04) Angular vs Angular 2 vs Latest Angular Version :
 - Angular 1 (Now AngularJS)
 - Angular 2 (Complete Re-Write) (Released in 2016)
 - Angular 4
@@ -15,7 +15,7 @@
 - Angular 7
 - Angular 9 (New version every 6 months) (Small, incremental, backwards-compatible changes)
 
-05) CLI Deep Dive & Troubleshooting
+### 05) CLI Deep Dive & Troubleshooting
 - If the CLI prompts you to answer some questions (some versions do that), you can simply hit ENTER for all questions. This will accept the default settings which are fine for this course.
 - If you want to dive deeper into the CLI and learn more about its usage, have a look at its official documentation: https://github.com/angular/angular-cli/wiki
 - You encountered issues during the installation of the CLI or setup of a new Angular project?
@@ -36,14 +36,14 @@
 - My changes are not reflected in the browser (App is not compiling)
     - Check if the window running ng serve displays an error. If that's not the case, make sure you're using the latest CLI version and try restarting your CLI
 
-06) Project Setup and First App :
+### 06) Project Setup and First App :
 - Install Angular CLI : sudo npm install -g @angular/cli@latest
 - Create new project : ng new my-first-app --no-strict
 - Project name should not be 'test'
 - To start the server : cd my-first-app
 - And then : ng serve
 
-07) Editing the First App : 
+### 07) Editing the First App : 
 - For importing FormsModule in app.module.ts
 ```
 import { NgModule } from '@angular/core';
@@ -72,7 +72,7 @@ export class AppModule { }
 <p>{{ name }}</p>
 ```
 
-08) The Course Structure : 
+### 08) The Course Structure : 
 - Getting Started
 - The Basics
 - Components & Data Binding
@@ -88,7 +88,7 @@ export class AppModule { }
 - Deployment
 - Animation & Testing
 
-09) How to get the Most out of the course :
+### 09) How to get the Most out of the course :
 - Watch the Videos
 - Do the Assignments
 - Do the Course Project
@@ -96,13 +96,13 @@ export class AppModule { }
 - Answer in Q&A
 - Docs + Google
 
-10) What is TypeScript? : 
+### 10) What is TypeScript? : 
 - More features than vanilla JS (e.g. Types, Classes, Interfaces))
 - TypeScript finally compiled to JavaScript by CLI.
 
-11) Optional: TypeScript Quick Introduction :
+### 11) Optional: TypeScript Quick Introduction :
 
-12) A Basic Project Setup Using Bootstrap For Styling :
+### 12) A Basic Project Setup Using Bootstrap For Styling :
 - For installing bootstrap for the project : npm i --save bootstrap@3
 - Add following code in angular.json inside build :
 ```
@@ -117,6 +117,6 @@ export class AppModule { }
 Bootstrap v3.4.1 (https://getbootstrap.com/)
 ```
 
-13) About the Course Code / Code Snapshots:
+### 13) About the Course Code / Code Snapshots:
 - Strict mode forces you to write more verbose code in some places (especially when it comes to class properties). 
 - If you enabled it by accident, you can also disable it by setting strict: false in your tsconfig.json file.

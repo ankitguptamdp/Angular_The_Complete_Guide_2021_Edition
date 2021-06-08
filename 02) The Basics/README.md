@@ -1,6 +1,6 @@
-14) Module Introduction :
+### 14) Module Introduction :
 
-15) How an angular app gets loaded and started : 
+### 15) How an angular app gets loaded and started : 
 - index.html is the single page served by the application.
 ```
 <!doctype html>
@@ -48,9 +48,9 @@ platformBrowserDynamic().bootstrapModule(AppModule)
 ```
 - The flow is main.ts -> app.module.ts -> app.component.ts
 
-16) Components are important :
+### 16) Components are important :
 
-17) Creating a new component : 
+### 17) Creating a new component : 
 - We can add a new component by creating a subfolder of app folder and then their corresponding component html and ts files inside of it.
 - Decorators are a TypeScript feature which allows you to enhance your classes for example, enhance elements. Here @Component is a Decorator.
 - We can import Component using 
@@ -70,7 +70,7 @@ export class ServerComponent {
 }
 ```
 
-18) Understanding the role of AppModule and Component Declaration :
+### 18) Understanding the role of AppModule and Component Declaration :
 - @NgModule decorator contains four thing : declarations, imports, providers and bootstrap.
 - bootstrap is responsible for telling Angular which component should you be aware of at the point of time the whole application starts, which component would you basically recognize in the index.html file here that component is app component.
 - app.module.ts while importing server.component don't append .ts
@@ -97,7 +97,7 @@ import { ServerComponent } from './server/server.component';
 export class AppModule { }
 ```
 
-19) Using Custom Components :
+### 19) Using Custom Components :
 - You can use emmet plugin for typing html faster.
 - app.component.html
 ```
@@ -106,14 +106,14 @@ export class AppModule { }
 <app-server></app-server>
 ```
 
-20) Creating Components with the CLI & Nesting Components :
+### 20) Creating Components with the CLI & Nesting Components :
 - Open new terminal keeping the ng server running, run the following command 
 - ng generate component servers
 - ng g c servers
 - Both commands are same
 - servers.component.spec.ts file is used for testing.
 
-21) Working with Component Templates :
+### 21) Working with Component Templates :
 - In servers.component.ts we can either use template or templateUrl in Component decorator.
 - In template we can directly write the html here and in templateUrl we can give the path to html file.
 - But one of them is necessary.
@@ -157,7 +157,7 @@ export class ServersComponent implements OnInit {
 }
 ```
 
-22) Working with Component Styles :
+### 22) Working with Component Styles :
 - styleUrls holds an array so multiple css file can be added.
 - styles can also be used to write inline styles.
 ```
@@ -178,7 +178,7 @@ export class AppComponent {
 }
 ```
 
-23) Fully Understanding the Component Selector : 
+### 23) Fully Understanding the Component Selector : 
 - Selector has to be unique, so that we don't overwrite accidentally an already existing element or may be a component made available by another third-party package we use in our project.
 - Right now, our selector is same selector as we use it in CSS for selecting an element, so we have app-servers here as an element and this is recognized by Angular because the selector we chose is app servers and this basically just looks how we select elements in CSS.
 - So that actually works like a CSS selector and therefore, we are not limited to selecting by element.
@@ -223,7 +223,7 @@ export class ServersComponent implements OnInit {
 </div>
 ```
 
-- Assignment 1 : Practicing Components :
+### - Assignment 1 : Practicing Components :
   - Create two new Components (manually or with CLI): WarningAlert and SuccessAlert
   - Output them beneath each other in the AppComponent
   - Output a warning or success message in the Components
@@ -239,9 +239,9 @@ export class ServersComponent implements OnInit {
 - ng generate component SuccessAlert
 - Refer basics-assignment-one
 
-24) Assignment Solution : 
+### 24) Assignment Solution : 
 
-25) What is Data Binding ? :
+### 25) What is Data Binding ? :
 - Data Binding = Communication
 - Data Binding is communication between you TypeScript code (Business Logic) and Template (HTML).
 - Output Data can be done in two ways :
@@ -252,7 +252,7 @@ export class ServersComponent implements OnInit {
 - Combination of Both : Two Way Binding :
   - [(ngModel)]="data"
 
-26) String Interpolation : 
+### 26) String Interpolation : 
 - You can explicitly add :string or :number to specify the type.
 - server.component.ts
 ```
@@ -282,7 +282,7 @@ export class ServerComponent {
 <p>{{ 'Server' }} with ID {{ serverId }} is {{ getServerStatus() }}</p>
 ```
 
-27) Property Binding :
+### 27) Property Binding :
 - ES6 arrow function :
 - () => {}
 - Square brackets indicate to Angular that we're using property binding, that we want to dynamically bind some property and disable the HTML attribute, in the end in normal HTML, only sets a specific property on the underlying DOM element.
@@ -320,7 +320,7 @@ export class ServersComponent implements OnInit {
 <app-server></app-server>
 ```
 
-28) Property Binding vs String Interpolation :
+### 28) Property Binding vs String Interpolation :
 - String interpolation using property binding :
   - <p [innerText]="allowNewServer"></p>
 - Don't mix string interpolation and property binding like [innerText]="{{ allowNewServer }}"
@@ -334,4 +334,233 @@ export class ServersComponent implements OnInit {
 <app-server></app-server>
 ```
 
-29) Event Binding : 
+### 29) Event Binding : 
+- servers.component.ts
+```
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-servers',
+  // selector: '[app-servers]',
+  // selector: '.app-servers',
+  templateUrl:'./servers.component.html',
+  styleUrls: ['./servers.component.css']
+})
+export class ServersComponent implements OnInit {
+  allowNewServer = false;
+  serverCreationStatus = 'No server was created!';
+
+  constructor() {
+    setTimeout(()=> {
+      this.allowNewServer = true;
+    },2000);
+  }
+
+  ngOnInit(): void {
+  }
+
+  onCreateServer(){
+    this.serverCreationStatus = 'Server was created!'
+  }
+
+}
+```
+
+- servers.component.html
+```
+<button class="btn btn-primary" [disabled]="!allowNewServer" (click)="onCreateServer()">Add Server</button>
+<p>{{ serverCreationStatus }}</p>
+<app-server></app-server>
+<app-server></app-server>
+```
+
+### 30) Bindable Properties And Events :
+- How do you know to which Properties or Events of HTML Elements you may bind? You can basically bind to all Properties and Events - a good idea is to console.log()  the element you're interested in to see which properties and events it offers.
+- Important: For events, you don't bind to onclick but only to click (=> (click)).
+- The MDN (Mozilla Developer Network) offers nice lists of all properties and events of the element you're interested in. Googling for YOUR_ELEMENT properties  or YOUR_ELEMENT events  should yield nice results.
+
+### 31) Passing And Using Data With Event Binding : 
+- (input)="onUpdateServerName()" will be fired on every keystroke.
+- $event is reserved variable name we can use in the template when using event binding.
+- For this event, so only between these quotation marks here, $event will simply be the data emitted with that event.
+- this.serverName = event.target.value;
+- target is of type input element, it will give an error. We can explicitly inform it about the type in TypeScript by adding HTML input element in front of it. We do this explicit casting with the opening and closing tag, with smaller and greater than sign and the type in-between.
+- this.serverName = (<HTMLInputElement>event.target).value;
+- servers.component.ts
+```
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-servers',
+  // selector: '[app-servers]',
+  // selector: '.app-servers',
+  templateUrl:'./servers.component.html',
+  styleUrls: ['./servers.component.css']
+})
+export class ServersComponent implements OnInit {
+  allowNewServer = false;
+  serverCreationStatus = 'No server was created!';
+  serverName = '';
+
+  constructor() {
+    setTimeout(()=> {
+      this.allowNewServer = true;
+    },2000);
+  }
+
+  ngOnInit(): void {
+  }
+
+  onCreateServer(){
+    this.serverCreationStatus = 'Server was created!'
+  }
+
+  onUpdateServerName(event: Event){
+    this.serverName = (<HTMLInputElement>event.target).value;
+  }
+}
+```
+
+- servers.component.html
+```
+<label>Server Name</label>
+<input type="text" class="form-control" (input)="onUpdateServerName($event)">
+<p>{{ serverName }}</p>
+<button class="btn btn-primary" [disabled]="!allowNewServer" (click)="onCreateServer()">Add Server</button>
+<p>{{ serverCreationStatus }}</p>
+<app-server></app-server>
+<app-server></app-server>
+```
+
+### 32) Important: FormsModule is Required for Two-Way-Binding! :
+- Important: For Two-Way-Binding (covered in the next lecture) to work, you need to enable the ngModel  directive. This is done by adding the FormsModule  to the imports[]  array in the AppModule.
+- You then also need to add the import from @angular/forms  in the app.module.ts file:
+- import { FormsModule } from '@angular/forms'; 
+- app.module.ts
+```
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+
+import { AppComponent } from './app.component';
+import { ServerComponent } from './server/server.component';
+import { ServersComponent } from './servers/servers.component';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    ServerComponent,
+    ServersComponent
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+### 33) Two Way Data Binding : 
+- <input type="text" class="form-control" [(ngModel)]="serverName">
+- This set up will do the following, it will trigger on the input event and update the value of serverName in our component automatically.
+- On the other hand, since it is two-way binding, it will also update the value of the input element if we change server name somewhere else.
+- servers.component.ts
+```
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-servers',
+  // selector: '[app-servers]',
+  // selector: '.app-servers',
+  templateUrl:'./servers.component.html',
+  styleUrls: ['./servers.component.css']
+})
+export class ServersComponent implements OnInit {
+  allowNewServer = false;
+  serverCreationStatus = 'No server was created!';
+  serverName = 'Test Server';
+
+  constructor() {
+    setTimeout(()=> {
+      this.allowNewServer = true;
+    },2000);
+  }
+
+  ngOnInit(): void {
+  }
+
+  onCreateServer(){
+    this.serverCreationStatus = 'Server was created!'
+  }
+
+  onUpdateServerName(event: Event){
+    this.serverName = (<HTMLInputElement>event.target).value;
+  }
+}
+```
+
+- servers.component.html
+```
+<label>Server Name</label>
+<input type="text" class="form-control" [(ngModel)]="serverName">
+<p>{{ serverName }}</p>
+<button class="btn btn-primary" [disabled]="!allowNewServer" (click)="onCreateServer()">Add Server</button>
+<p>{{ serverCreationStatus }}</p>
+<app-server></app-server>
+<app-server></app-server>
+```
+
+### 34) Combining all forms of data binding : 
+- servers.component.ts
+```
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-servers',
+  // selector: '[app-servers]',
+  // selector: '.app-servers',
+  templateUrl:'./servers.component.html',
+  styleUrls: ['./servers.component.css']
+})
+export class ServersComponent implements OnInit {
+  allowNewServer = false;
+  serverCreationStatus = 'No server was created!';
+  serverName = 'Test Server';
+
+  constructor() {
+    setTimeout(()=> {
+      this.allowNewServer = true;
+    },2000);
+  }
+
+  ngOnInit(): void {
+  }
+
+  onCreateServer(){
+    this.serverCreationStatus = 'Server was created! Name is ' + this.serverName;
+  }
+
+  onUpdateServerName(event: Event){
+    this.serverName = (<HTMLInputElement>event.target).value;
+  }
+}
+```
+
+- servers.component.html
+```
+<label>Server Name</label>
+<input type="text" class="form-control" [(ngModel)]="serverName">
+<button class="btn btn-primary" [disabled]="!allowNewServer" (click)="onCreateServer()">Add Server</button>
+<p>{{ serverCreationStatus }}</p>
+<app-server></app-server>
+<app-server></app-server>
+```
+
+### - Assignment 2 : Practicing Data Binding : 
+- Add a input field which updates a property ("username") via Two Way Binding
+- Output the username properly via String Interpolation (in a paragraph below the input)
+- Add a button which may only be clicked if the username is NOT an empty string
+- Upon clicking the button, the username should be reset to an empty string
+
