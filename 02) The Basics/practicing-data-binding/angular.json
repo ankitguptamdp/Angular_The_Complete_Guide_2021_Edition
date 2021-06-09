@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "basics-assignment-one": {
+    "practicing-data-binding": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/basics-assignment-one",
+            "outputPath": "dist/practicing-data-binding",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -65,10 +65,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "basics-assignment-one:build:production"
+              "browserTarget": "practicing-data-binding:build:production"
             },
             "development": {
-              "browserTarget": "basics-assignment-one:build:development"
+              "browserTarget": "practicing-data-binding:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -76,7 +76,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "basics-assignment-one:build"
+            "browserTarget": "practicing-data-binding:build"
           }
         },
         "test": {
@@ -99,5 +99,5 @@
       }
     }
   },
-  "defaultProject": "basics-assignment-one"
+  "defaultProject": "practicing-data-binding"
 }

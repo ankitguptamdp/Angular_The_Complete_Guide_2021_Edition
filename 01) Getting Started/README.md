@@ -103,7 +103,7 @@ export class AppModule { }
 ### 11) Optional: TypeScript Quick Introduction :
 
 ### 12) A Basic Project Setup Using Bootstrap For Styling :
-- For installing bootstrap for the project : npm i --save bootstrap@3
+- For installing bootstrap for the project : npm i bootstrap@3 --save
 - Add following code in angular.json inside build :
 ```
 "styles": [

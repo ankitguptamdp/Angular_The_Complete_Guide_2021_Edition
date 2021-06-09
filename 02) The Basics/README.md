@@ -322,7 +322,7 @@ export class ServersComponent implements OnInit {
 
 ### 28) Property Binding vs String Interpolation :
 - String interpolation using property binding :
-  - <p [innerText]="allowNewServer"></p>
+```<p [innerText]="allowNewServer"></p>```
 - Don't mix string interpolation and property binding like [innerText]="{{ allowNewServer }}"
 - String interpolation works only in a normal template, not within another expression of that template, not within a property binding.
 - servers.component.html
@@ -463,7 +463,7 @@ export class AppModule { }
 ```
 
 ### 33) Two Way Data Binding : 
-- <input type="text" class="form-control" [(ngModel)]="serverName">
+```<input type="text" class="form-control" [(ngModel)]="serverName">```
 - This set up will do the following, it will trigger on the input event and update the value of serverName in our component automatically.
 - On the other hand, since it is two-way binding, it will also update the value of the input element if we change server name somewhere else.
 - servers.component.ts
@@ -563,4 +563,89 @@ export class ServersComponent implements OnInit {
 - Output the username properly via String Interpolation (in a paragraph below the input)
 - Add a button which may only be clicked if the username is NOT an empty string
 - Upon clicking the button, the username should be reset to an empty string
+- app.component.html
+```
+<input type="text" class="form-control" [(ngModel)]="username" (input)="onUpdateUserName($event)">
+<p>Username : {{ username }}</p>
+<button class="btn btn-primary" [disabled]="emptyString" (click)="onClickResetUsername()">Reset Username</button>
+```
+- app.component.ts
+```
+import { Component } from '@angular/core';
 
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  username= 'Test User';
+  emptyString = false;
+
+  onUpdateUserName(event: Event){
+    if (this.username==""){
+      this.emptyString = true;
+    }
+    else{
+      this.emptyString = false;
+    }
+  }
+
+  onClickResetUsername(){
+    this.username = ""
+    this.emptyString = true
+  }
+}
+
+```
+
+- Their solution :
+- app.component.ts
+```
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  username= '';
+}
+```
+
+- app.component.html
+```
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <hr>
+      <label>Username</label>
+      <input type="text" class="form-control" [(ngModel)]="username">
+      <p>Username : {{ username }}</p>
+      <button class="btn btn-primary" [disabled]="username === ''" (click)="username = ''">Reset Username</button>
+    </div>
+  </div>
+</div>
+```
+
+35) Assignment Solution :
+
+36) Understanding Directives :
+- Directives are instructions in the DOM, components are kind of such instructions in the DOM. Once we place the selector of our component somewhere in our templates, at this point of time we're instructing Angular to add the content of our component template and the business logic in our TypeScript code in this place where we use the selector.
+- This was our instruction, Angular please add our component in this place and indeed components are directives with a template, there are also directives without a template.
+- So an example would be the appTurnGreen directive which would be as custom directive we could build.
+```
+<p appTurnGreen>Receives a green background!</p>
+```
+- We typically add directives with and attribute selector but technically the selector of a directive can be configured just like the selector of a component, so you could also use CSS classes or the element style but again typically use the attribute style and on this paragraph, this directive might simply color the text green you could say. So Angular would find this instruction, here we would have defined our directive with the directive decorator to inform Angular that this class holds a directive and there, we might have the logic to turn this green.
+```
+@Directive({
+  selector: '[appTurnGreen]'
+})
+export class TurnGreenDirective{
+
+}
+```
+
+37) Using ngIf to Output Data Conditionally :
