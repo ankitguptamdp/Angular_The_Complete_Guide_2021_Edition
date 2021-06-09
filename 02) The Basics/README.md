@@ -995,3 +995,93 @@ export class AppComponent {
 }
 ```
 
+### 42) Assignment Solution :
+- app.component.css
+```
+.logAfter5{
+  color: white
+}
+```
+
+- app.component.html
+```
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <hr>
+      <button class="btn btn-primary" (click)="onDisplayDetailsButtonClick()">Display Details</button>
+      <p *ngIf="displayDetails">Secret Password = tuna</p>
+      <div *ngFor="let log of displayDetailsButtonClickLog" [ngStyle]="{backgroundColor: log[0] >= 5 ? 'blue' : 'transparent'}" [ngClass]="{logAfter5: log[0] >= 5}">{{ log[0] }} : {{ log[1] }}</div>
+    </div>
+  </div>
+</div>
+```
+
+- app.component.ts
+```
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  displayDetails = false;
+  displayDetailsButtonClickLog = [];
+
+  getTime() {
+    var currentTime = new Date();
+    var currentOffset = currentTime.getTimezoneOffset();
+    var ISTOffset = 330;   // IST offset UTC +5:30
+    var ISTTime = new Date(currentTime.getTime() + (ISTOffset + currentOffset) * 60000);
+    // ISTTime now represents the time in IST coordinates
+    var hoursIST = ISTTime.getHours();
+    var minutesIST = ISTTime.getMinutes();
+    var secondsIST = ISTTime.getSeconds();
+    return hoursIST + ":" + minutesIST + ":" + secondsIST;
+  }
+
+  onDisplayDetailsButtonClick() {
+    this.displayDetails = !this.displayDetails;
+    this.displayDetailsButtonClickLog.push([this.displayDetailsButtonClickLog.length+1, this.getTime()])
+  }
+}
+```
+
+### 43) Getting the index when using ngFor :
+- Equal to index ( = index) is kind of reserved expression that gives access to the index of the current iteration.
+- index starts at 0.
+- app.component.ts
+```
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  displayDetails = false;
+  displayDetailsButtonClickLog = [];
+
+  onDisplayDetailsButtonClick() {
+    this.displayDetails = !this.displayDetails;
+    this.displayDetailsButtonClickLog.push(new Date());
+  }
+}
+```
+
+- app.component.html
+```
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <hr>
+      <button class="btn btn-primary" (click)="onDisplayDetailsButtonClick()">Display Details</button>
+      <p *ngIf="displayDetails">Secret Password = tuna</p>
+      <div *ngFor="let log of displayDetailsButtonClickLog; let i = index" [ngStyle]="{backgroundColor: i > 5 ? 'blue' : 'transparent'}" [ngClass]="{logAfter5: i > 5}">{{ log }}</div>
+    </div>
+  </div>
+</div>
+```

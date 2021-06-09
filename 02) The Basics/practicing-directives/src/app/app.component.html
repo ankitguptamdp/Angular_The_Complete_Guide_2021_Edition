@@ -4,7 +4,7 @@
       <hr>
       <button class="btn btn-primary" (click)="onDisplayDetailsButtonClick()">Display Details</button>
       <p *ngIf="displayDetails">Secret Password = tuna</p>
-      <p *ngFor="let log of displayDetailsButtonClickLog" [ngStyle]="{backgroundColor: getColor(log[0])}" [ngClass]="{logAfter5: log[0] >= 5}">{{ log[0] }} : {{ log[1] }}</p>
+      <div *ngFor="let log of displayDetailsButtonClickLog; let i = index" [ngStyle]="{backgroundColor: i > 5 ? 'blue' : 'transparent'}" [ngClass]="{logAfter5: i > 5}">{{ log }}</div>
     </div>
   </div>
 </div>
