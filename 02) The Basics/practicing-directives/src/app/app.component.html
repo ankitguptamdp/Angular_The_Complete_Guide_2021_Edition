@@ -1,0 +1,10 @@
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <hr>
+      <button class="btn btn-primary" (click)="onDisplayDetailsButtonClick()">Display Details</button>
+      <p *ngIf="displayDetails">Secret Password = tuna</p>
+      <p *ngFor="let log of displayDetailsButtonClickLog" [ngStyle]="{backgroundColor: getColor(log[0])}" [ngClass]="{logAfter5: log[0] >= 5}">{{ log[0] }} : {{ log[1] }}</p>
+    </div>
+  </div>
+</div>

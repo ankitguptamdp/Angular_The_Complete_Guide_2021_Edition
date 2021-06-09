@@ -629,9 +629,9 @@ export class AppComponent {
 </div>
 ```
 
-35) Assignment Solution :
+### 35) Assignment Solution :
 
-36) Understanding Directives :
+### 36) Understanding Directives :
 - Directives are instructions in the DOM, components are kind of such instructions in the DOM. Once we place the selector of our component somewhere in our templates, at this point of time we're instructing Angular to add the content of our component template and the business logic in our TypeScript code in this place where we use the selector.
 - This was our instruction, Angular please add our component in this place and indeed components are directives with a template, there are also directives without a template.
 - So an example would be the appTurnGreen directive which would be as custom directive we could build.
@@ -648,4 +648,350 @@ export class TurnGreenDirective{
 }
 ```
 
-37) Using ngIf to Output Data Conditionally :
+### 37) Using ngIf to Output Data Conditionally :
+- Directives are added by using an attribute selector and pretty much all the built-in directives use that selector, nfIf does.
+- ngIf is added by adding a star. The star is required because ngIf is a structural directive which means it changes the structure of our DOM, it either adds this element or it doesn't add it.
+- But the important thing is it's really added or removed to or from the DOM, it's not there all the time, it's not hidden, it's just not there.
+- servers.component.ts
+```
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-servers',
+  // selector: '[app-servers]',
+  // selector: '.app-servers',
+  templateUrl:'./servers.component.html',
+  styleUrls: ['./servers.component.css']
+})
+export class ServersComponent implements OnInit {
+  allowNewServer = false;
+  serverCreationStatus = 'No server was created!';
+  serverName = 'Test Server';
+  serverCreated = false;
+
+  constructor() {
+    setTimeout(()=> {
+      this.allowNewServer = true;
+    },2000);
+  }
+
+  ngOnInit(): void {
+  }
+
+  onCreateServer(){
+    this.serverCreated = true;
+    this.serverCreationStatus = 'Server was created! Name is ' + this.serverName;
+  }
+
+  onUpdateServerName(event: Event){
+    this.serverName = (<HTMLInputElement>event.target).value;
+  }
+}
+```
+
+- servers.component.html
+```
+<label>Server Name</label>
+<input type="text" class="form-control" [(ngModel)]="serverName">
+<button class="btn btn-primary" [disabled]="!allowNewServer" (click)="onCreateServer()">Add Server</button>
+<p *ngIf="serverCreated">Server was created, server name is {{ serverName }}</p>
+<app-server></app-server>
+<app-server></app-server>
+```
+
+### 38) Enhancing ngIf with an Else Condition :
+- We can achieve this by placing a local reference on this element (here noServer)
+- ng-template is a component, that directive shipping with Angular which you can use to mark places in the DOM
+- server.component.ts
+```
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-server',
+  templateUrl: './server.component.html'
+})
+export class ServerComponent {
+  serverId: number = 10;
+  serverStatus: string = 'offline';
+
+  constructor(){
+    this.serverStatus = Math.random() > 0.5 ? 'online' : 'offline';
+  }
+
+  getServerStatus() {
+    return this.serverStatus;
+  }
+
+  getColor(){
+    return this.serverStatus === 'online' ? 'green' : 'red';
+  }
+}
+```
+
+- servers.component.html
+```
+<label>Server Name</label>
+<input type="text" class="form-control" [(ngModel)]="serverName">
+<button class="btn btn-primary" [disabled]="!allowNewServer" (click)="onCreateServer()">Add Server</button>
+<p *ngIf="serverCreated; else noServer">Server was created, server name is {{ serverName }}</p>
+<ng-template #noServer>
+  <p>No server was created!</p>
+</ng-template>
+<app-server></app-server>
+<app-server></app-server>
+```
+
+### 39) Styling Elements Dynamically with ngStyle :
+- ngIf is a structural directive, the other type of directives are attribute directives which are called like this because they really just look like normal HTML attributes without a star basically.
+- Unlike structural directives, attribute directives don't add or remove elements. They only change the element they were placed on.
+- ngStyle is built-in directive, you can recognize this on the ng at the beginning and ngStyle, that's the directive, here we will use property binding on this directive and it's super important to understand that the square brackets here are not part of the directive name, the directive name is just ngStyle, the square brackets indicate that we want to bind to some property on this directive and this property name happens to also be ngStyle.
+- This ngStyle property expects to get a Javascript object and here, we define key-value pairs of the style name as the key and the value of the style as the value.
+- ngStyle is an attribute directive that updates styles for the containing HTML element at runtime.
+- server.component.html
+```
+<p [ngStyle]="{backgroundColor: getColor()}">{{ 'Server' }} with ID {{ serverId }} is {{ getServerStatus() }}</p>
+```
+
+- server.component.ts
+```
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-server',
+  templateUrl: './server.component.html'
+})
+export class ServerComponent {
+  serverId: number = 10;
+  serverStatus: string = 'offline';
+
+  constructor(){
+    this.serverStatus = Math.random() > 0.5 ? 'online' : 'offline';
+  }
+
+  getServerStatus() {
+    return this.serverStatus;
+  }
+
+  getColor(){
+    return this.serverStatus === 'online' ? 'green' : 'red';
+  }
+}
+```
+
+### 40) Applying CSS classes dynamically with ngClass :
+- ngClass allows us to dynamically add or remove CSS classes.
+- This is a directive and only works as intended when using property binding. (Wrapping in square brackets)
+- We have to pass JavaScript object to ngClass.
+- Here also we are having key value pair. The keys are the CSS classnames and the values are the conditions determining whether this class should be attached or not.
+- server.component.ts
+```
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-server',
+  templateUrl: './server.component.html',
+  styles: [`
+    .online{
+      color: white;
+    }
+  `]
+})
+export class ServerComponent {
+  serverId: number = 10;
+  serverStatus: string = 'offline';
+
+  constructor(){
+    this.serverStatus = Math.random() > 0.5 ? 'online' : 'offline';
+  }
+
+  getServerStatus() {
+    return this.serverStatus;
+  }
+
+  getColor(){
+    return this.serverStatus === 'online' ? 'green' : 'red';
+  }
+}
+```
+- server.component.html
+```
+<p [ngStyle]="{backgroundColor: getColor()}" [ngClass]="{online: serverStatus === 'online'}">{{ 'Server' }} with ID {{ serverId }} is {{ getServerStatus() }}</p>
+```
+
+### 41) Outputting List with ngFor :
+- ngFor is also a structural directive which changes the DOM itself.
+- In this we define a temporary variable inside the loop with let, give it any name you like server and then of servers. Servers here is the property we defined in the TypeScript file and this will now loop through all elements in this array and assign the individual element to this dynamic server variable.
+- servers.component.html
+```
+<label>Server Name</label>
+<input type="text" class="form-control" [(ngModel)]="serverName">
+<button class="btn btn-primary" [disabled]="!allowNewServer" (click)="onCreateServer()">Add Server</button>
+<p *ngIf="serverCreated; else noServer">Server was created, server name is {{ serverName }}</p>
+<ng-template #noServer>
+  <p>No server was created!</p>
+</ng-template>
+<app-server *ngFor="let server of servers"></app-server>
+```
+- servers.component.ts
+```
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-servers',
+  // selector: '[app-servers]',
+  // selector: '.app-servers',
+  templateUrl:'./servers.component.html',
+  styleUrls: ['./servers.component.css']
+})
+export class ServersComponent implements OnInit {
+  allowNewServer = false;
+  serverCreationStatus = 'No server was created!';
+  serverName = 'Test Server';
+  serverCreated = false;
+  servers = ['Test Server', 'Test Server 2'];
+
+  constructor() {
+    setTimeout(()=> {
+      this.allowNewServer = true;
+    },2000);
+  }
+
+  ngOnInit(): void {
+  }
+
+  onCreateServer(){
+    this.serverCreated = true;
+    this.servers.push(this.serverName);
+    this.serverCreationStatus = 'Server was created! Name is ' + this.serverName;
+  }
+
+  onUpdateServerName(event: Event){
+    this.serverName = (<HTMLInputElement>event.target).value;
+  }
+}
+```
+
+### Assignment 3 : Practicing Directives :
+- Add a button which says 'Display Details'
+- Add a paragraph with any content of your choice (e.g. 'Secret Password = tuna')
+- Toggle the displaying of that paragraph with the button created in the first step
+- Log all button clicks in an array and output that array below the secret paragraph (maybe log a timestamp or simply an incrementing number)
+- Starting at the 5th log item, give all future log items a blue background (via ngStyle) and white color (ngClass)
+
+- Create new project : ng new practicing-directives --no-strict
+- Type no to routing
+- Select CSS by pressing Enter
+- cd practicing-directives
+- Install bootstrap : npm i bootstrap@3 --save
+- Add following code in angular.json inside build :
+```
+"styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "src/styles.css"
+            ],
+```
+- Delete following from app.component.ts
+```
+title = 'practicing-directives';
+```
+
+- Clean app.component.html
+- Import FormsModule in app.module.ts
+```
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+
+import { AppComponent } from './app.component';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+- Add following code in app.component.html
+```
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <hr>
+
+    </div>
+  </div>
+</div>
+```
+
+- To run the application : ng serve
+
+- app.component.css
+```
+.logAfter5{
+  color: white
+}
+```
+
+- app.component.html
+```
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <hr>
+      <button class="btn btn-primary" (click)="onDisplayDetailsButtonClick()">Display Details</button>
+      <p *ngIf="displayDetails">Secret Password = tuna</p>
+      <p *ngFor="let log of displayDetailsButtonClickLog" [ngStyle]="{backgroundColor: getColor(log[0])}" [ngClass]="{logAfter5: log[0] >= 5}">{{ log[0] }} : {{ log[1] }}</p>
+    </div>
+  </div>
+</div>
+```
+
+- app.component.ts
+```
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  displayDetails = false;
+  displayDetailsButtonClickLog = [];
+  displayDetailsButtonClickCount = 0;
+
+  getTime() {
+    var currentTime = new Date();
+    var currentOffset = currentTime.getTimezoneOffset();
+    var ISTOffset = 330;   // IST offset UTC +5:30
+    var ISTTime = new Date(currentTime.getTime() + (ISTOffset + currentOffset) * 60000);
+    // ISTTime now represents the time in IST coordinates
+    var hoursIST = ISTTime.getHours();
+    var minutesIST = ISTTime.getMinutes();
+    var secondsIST = ISTTime.getSeconds();
+    return hoursIST + ":" + minutesIST + ":" + secondsIST;
+  }
+
+  getColor(count: number){
+    if(count>=5){
+      return 'blue';
+    }
+    else{
+      return 'white';
+    }
+  }
+
+  onDisplayDetailsButtonClick() {
+    this.displayDetails = !this.displayDetails;
+    this.displayDetailsButtonClickLog.push([++this.displayDetailsButtonClickCount, this.getTime()])
+  }
+}
+```
+
