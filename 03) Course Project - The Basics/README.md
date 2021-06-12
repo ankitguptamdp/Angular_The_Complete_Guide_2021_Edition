@@ -87,13 +87,13 @@ export class AppModule { }
 
 ### 48) Creating the components : 
 - To create components to create component without header.component.spec.ts file:
-- ng g c header --skipTests true
-- ng g c recipes --skipTests true
-- ng g c recipes/recipe-list --skipTests true
-- ng g c recipes/recipe-detail --skipTests true
-- ng g c recipes/recipe-list/recipe-item --skipTests true
-- ng g c shopping-list --skipTests true
-- ng g c shopping-list/shopping-edit --skipTests true
+- ng g c header --skip-tests true
+- ng g c recipes --skip-tests true
+- ng g c recipes/recipe-list --skip-tests true
+- ng g c recipes/recipe-detail --skip-tests true
+- ng g c recipes/recipe-list/recipe-item --skip-tests true
+- ng g c shopping-list --skip-tests true
+- ng g c shopping-list/shopping-edit --skip-tests true
 
 - app.component.html
 ```

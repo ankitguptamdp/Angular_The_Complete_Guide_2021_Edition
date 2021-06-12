@@ -61,3 +61,9 @@ export class AppModule { }
 - To run the application : ng serve
 - Hit localhost:4200 in the browser
 - Check for bootstrap in styles.css file under source in developer tools.
+
+### Create Component :
+- ng g c componentName --skip-tests true
+
+### For killing port 4200
+- sudo kill $(sudo lsof -t -i:4200)
