@@ -412,9 +412,9 @@ export class RecipeListComponent implements OnInit {
         Manage Recipe <span class="caret"></span>
       </button>
       <ul class="dropdown-menu">
-        <li><a href="#"></a>To Shopping List</li>
-        <li><a href="#"></a>Edit Recipe</li>
-        <li><a href="#"></a>Delete Recipe</li>
+        <li><a href="#">To Shopping List</a></li>
+        <li><a href="#">Edit Recipe</a></li>
+        <li><a href="#">Delete Recipe</a></li>
       </ul>
     </div>
   </div>
