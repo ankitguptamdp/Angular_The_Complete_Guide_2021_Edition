@@ -851,3 +851,931 @@ export class EditServerComponent implements OnInit {
 ```
 
 ### 141) Configuring the Handling of Query Parameters :
+- server.component.ts
+```
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+
+import { ServersService } from '../servers.service';
+
+@Component({
+  selector: 'app-server',
+  templateUrl: './server.component.html',
+  styleUrls: ['./server.component.css']
+})
+export class ServerComponent implements OnInit {
+  server: { id: number, name: string, status: string };
+
+  constructor(private serversService: ServersService, private route: ActivatedRoute, private router: Router) { }
+
+  ngOnInit() {
+    const id = +this.route.snapshot.params['id'];
+    this.server = this.serversService.getServer(id);
+    this.route.params.subscribe(
+      (params: Params) => {
+        this.server = this.serversService.getServer(+params['id']);
+      }
+    );
+  }
+
+  onEdit() {
+    this.router.navigate(['edit'], { relativeTo: this.route, queryParamsHandling: 'preserve' });
+  }
+}
+```
+- Side-note: We still load the wrong server here because we don't use the ID passed in the URL in this component. Will be improved in a future lecture!
+
+### 142) Redirecting and Wildcard Routes :
+- ng g c page-not-found
+- page-not-found.component.html
+```
+<h3>Sorry, this page isn't available.</h3>
+```
+- app.module.ts
+```
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { RouterModule, Routes } from '@angular/router';
+
+import { AppComponent } from './app.component';
+import { HomeComponent } from './home/home.component';
+import { UsersComponent } from './users/users.component';
+import { ServersComponent } from './servers/servers.component';
+import { UserComponent } from './users/user/user.component';
+import { EditServerComponent } from './servers/edit-server/edit-server.component';
+import { ServerComponent } from './servers/server/server.component';
+import { ServersService } from './servers/servers.service';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+
+const appRoutes: Routes = [
+  { path: '', component: HomeComponent },
+  {
+    path: 'users', component: UsersComponent, children: [
+      { path: ':id/:name', component: UserComponent },
+    ]
+  },
+  {
+    path: 'servers', component: ServersComponent, children: [
+      { path: ':id', component: ServerComponent },
+      { path: ':id/edit', component: EditServerComponent },
+    ]
+  },
+  { path: 'not-found', component: PageNotFoundComponent },
+  { path: '**', redirectTo: '/not-found' },
+];
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    HomeComponent,
+    UsersComponent,
+    ServersComponent,
+    UserComponent,
+    EditServerComponent,
+    ServerComponent,
+    PageNotFoundComponent
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    RouterModule.forRoot(appRoutes)
+  ],
+  providers: [ServersService],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+### 143) Important: Redirection Path Matching :
+- In our example, we didn't encounter any issues when we tried to redirect the user. But that's not always the case when adding redirection.
+- By default, Angular matches paths by prefix. That means, that the following route will match both /recipes  and just / 
+```
+{ path: '', redirectTo: '/somewhere-else' } 
+```
+- Actually, Angular will give you an error here, because that's a common gotcha: This route will now ALWAYS redirect you! Why?
+- Since the default matching strategy is "prefix" , Angular checks if the path you entered in the URL does start with the path specified in the route. Of course every path starts with ''  (Important: That's no whitespace, it's simply "nothing").
+- To fix this behavior, you need to change the matching strategy to "full" :
+```
+{ path: '', redirectTo: '/somewhere-else', pathMatch: 'full' } 
+```
+- Now, you only get redirected, if the full path is ''  (so only if you got NO other content in your path in this example).
+
+### 144) Outsourcing the Route Configuration :
+- app.module.ts
+```
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+import { AppComponent } from './app.component';
+import { HomeComponent } from './home/home.component';
+import { UsersComponent } from './users/users.component';
+import { ServersComponent } from './servers/servers.component';
+import { UserComponent } from './users/user/user.component';
+import { EditServerComponent } from './servers/edit-server/edit-server.component';
+import { ServerComponent } from './servers/server/server.component';
+import { ServersService } from './servers/servers.service';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { AppRoutingModule } from './app-routing.module';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    HomeComponent,
+    UsersComponent,
+    ServersComponent,
+    UserComponent,
+    EditServerComponent,
+    ServerComponent,
+    PageNotFoundComponent
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    AppRoutingModule
+  ],
+  providers: [ServersService],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+- app-routing.module.ts
+```
+import { NgModule } from "@angular/core";
+import { RouterModule, Routes } from "@angular/router";
+
+import { HomeComponent } from "./home/home.component";
+import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
+import { EditServerComponent } from "./servers/edit-server/edit-server.component";
+import { ServerComponent } from "./servers/server/server.component";
+import { ServersComponent } from "./servers/servers.component";
+import { UserComponent } from "./users/user/user.component";
+import { UsersComponent } from "./users/users.component";
+
+const appRoutes: Routes = [
+  { path: '', component: HomeComponent },
+  {
+    path: 'users', component: UsersComponent, children: [
+      { path: ':id/:name', component: UserComponent },
+    ]
+  },
+  {
+    path: 'servers', component: ServersComponent, children: [
+      { path: ':id', component: ServerComponent },
+      { path: ':id/edit', component: EditServerComponent },
+    ]
+  },
+  { path: 'not-found', component: PageNotFoundComponent },
+  { path: '**', redirectTo: '/not-found' },
+];
+
+
+@NgModule({
+  imports: [
+    RouterModule.forRoot(appRoutes)
+  ],
+  exports: [RouterModule]
+})
+export class AppRoutingModule {
+
+}
+```
+
+### 145) An Introduction to Guards :
+
+### 146) Protecting Routes with canActivate :
+- app.module.ts
+```
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+import { AppComponent } from './app.component';
+import { HomeComponent } from './home/home.component';
+import { UsersComponent } from './users/users.component';
+import { ServersComponent } from './servers/servers.component';
+import { UserComponent } from './users/user/user.component';
+import { EditServerComponent } from './servers/edit-server/edit-server.component';
+import { ServerComponent } from './servers/server/server.component';
+import { ServersService } from './servers/servers.service';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { AppRoutingModule } from './app-routing.module';
+import { AuthService } from './auth.service';
+import { AuthGuard } from './auth-guard.service';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    HomeComponent,
+    UsersComponent,
+    ServersComponent,
+    UserComponent,
+    EditServerComponent,
+    ServerComponent,
+    PageNotFoundComponent
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    AppRoutingModule
+  ],
+  providers: [ServersService, AuthService, AuthGuard],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+- auth.service.ts
+```
+export class AuthService {
+  loggedIn = false;
+
+  isAuthenticated() {
+    const promise = new Promise(
+      (resolve, reject) => {
+        setTimeout(() => {
+          resolve(this.loggedIn);
+        }, 800);
+      }
+    );
+    return promise;
+  }
+
+  login() {
+    this.loggedIn = true;
+  }
+  logout() {
+    this.loggedIn = false;
+  }
+}
+```
+- auth-guard.service.ts
+```
+import { Injectable } from "@angular/core";
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from "@angular/router";
+import { Observable } from "rxjs";
+
+import { AuthService } from "./auth.service";
+
+@Injectable()
+export class AuthGuard implements CanActivate {
+  constructor(private authService: AuthService, private router: Router) { }
+
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
+    return this.authService.isAuthenticated()
+      .then(
+        (authenticated: boolean) => {
+          if (authenticated) {
+            return true;
+          }
+          else {
+            this.router.navigate(['/']);
+            return false;
+          }
+        }
+      );
+  }
+}
+```
+- app-routing.module.ts
+```
+import { NgModule } from "@angular/core";
+import { RouterModule, Routes } from "@angular/router";
+import { AuthGuard } from "./auth-guard.service";
+
+import { HomeComponent } from "./home/home.component";
+import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
+import { EditServerComponent } from "./servers/edit-server/edit-server.component";
+import { ServerComponent } from "./servers/server/server.component";
+import { ServersComponent } from "./servers/servers.component";
+import { UserComponent } from "./users/user/user.component";
+import { UsersComponent } from "./users/users.component";
+
+const appRoutes: Routes = [
+  { path: '', component: HomeComponent },
+  {
+    path: 'users', component: UsersComponent, children: [
+      { path: ':id/:name', component: UserComponent },
+    ]
+  },
+  {
+    path: 'servers', canActivate: [AuthGuard], component: ServersComponent, children: [
+      { path: ':id', component: ServerComponent },
+      { path: ':id/edit', component: EditServerComponent },
+    ]
+  },
+  { path: 'not-found', component: PageNotFoundComponent },
+  { path: '**', redirectTo: '/not-found' },
+];
+
+
+@NgModule({
+  imports: [
+    RouterModule.forRoot(appRoutes)
+  ],
+  exports: [RouterModule]
+})
+export class AppRoutingModule {
+
+}
+```
+
+### 147) Protecting Child (Nested) Routes with canActivateChild :
+- auth-guard.service.ts
+```
+import { Injectable } from "@angular/core";
+import { ActivatedRouteSnapshot, CanActivate, CanActivateChild, Router, RouterStateSnapshot } from "@angular/router";
+import { Observable } from "rxjs";
+
+import { AuthService } from "./auth.service";
+
+@Injectable()
+export class AuthGuard implements CanActivate, CanActivateChild {
+  constructor(private authService: AuthService, private router: Router) { }
+
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
+    return this.authService.isAuthenticated()
+      .then(
+        (authenticated: boolean) => {
+          if (authenticated) {
+            return true;
+          }
+          else {
+            this.router.navigate(['/']);
+            return false;
+          }
+        }
+      );
+  }
+
+  canActivateChild(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
+    return this.canActivate(route, state);
+  }
+}
+```
+- app-routing.module.ts
+```
+import { NgModule } from "@angular/core";
+import { RouterModule, Routes } from "@angular/router";
+import { AuthGuard } from "./auth-guard.service";
+
+import { HomeComponent } from "./home/home.component";
+import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
+import { EditServerComponent } from "./servers/edit-server/edit-server.component";
+import { ServerComponent } from "./servers/server/server.component";
+import { ServersComponent } from "./servers/servers.component";
+import { UserComponent } from "./users/user/user.component";
+import { UsersComponent } from "./users/users.component";
+
+const appRoutes: Routes = [
+  { path: '', component: HomeComponent },
+  {
+    path: 'users', component: UsersComponent, children: [
+      { path: ':id/:name', component: UserComponent },
+    ]
+  },
+  {
+    path: 'servers', canActivateChild: [AuthGuard], component: ServersComponent, children: [
+      { path: ':id', component: ServerComponent },
+      { path: ':id/edit', component: EditServerComponent },
+    ]
+  },
+  { path: 'not-found', component: PageNotFoundComponent },
+  { path: '**', redirectTo: '/not-found' },
+];
+
+
+@NgModule({
+  imports: [
+    RouterModule.forRoot(appRoutes)
+  ],
+  exports: [RouterModule]
+})
+export class AppRoutingModule {
+
+}
+```
+
+### 148) Using a Fake Auth Service :
+- home.component.html
+```
+<h4>Welcome to Server Manager 4.0</h4>
+<p>Manage your Servers and Users.</p>
+<button class="btn btn-primary" (click)="onLoadServer(1)">Load Server 1</button>
+<button class="btn btn-default" (click)="onLogin()">Login</button>
+<button class="btn btn-default" (click)="onLogout()">Logout</button>
+```
+- home.component.ts
+```
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../auth.service';
+
+@Component({
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css']
+})
+export class HomeComponent implements OnInit {
+
+  constructor(private router: Router, private authService: AuthService) { }
+
+  ngOnInit() {
+  }
+
+  onLoadServer(id: number) {
+    // Complex Calculation
+    this.router.navigate(['/servers', id, 'edit'], { queryParams: { allowEdit: '1' }, fragment: 'loading' });
+  }
+
+  onLogin() {
+    this.authService.login();
+  }
+
+  onLogout() {
+    this.authService.logout();
+  }
+}
+```
+
+### 149) Controlling Navigation with canDeactivate :
+- nextState?: RouterStateSnapshot is optional parameter.
+- edit-server.component.ts
+```
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Observable } from 'rxjs';
+
+import { ServersService } from '../servers.service';
+import { CanComponentDeactivate } from './can-deactivate-guard.service';
+
+@Component({
+  selector: 'app-edit-server',
+  templateUrl: './edit-server.component.html',
+  styleUrls: ['./edit-server.component.css']
+})
+export class EditServerComponent implements OnInit, CanComponentDeactivate {
+  server: { id: number, name: string, status: string };
+  serverName = '';
+  serverStatus = '';
+  allowEdit = false;
+  changesSaved = false;
+
+  constructor(private serversService: ServersService, private route: ActivatedRoute, private router: Router) { }
+
+  ngOnInit() {
+    console.log(this.route.snapshot.queryParams);
+    console.log(this.route.snapshot.fragment);
+    this.route.queryParams.subscribe(
+      (queryParams: Params) => {
+        this.allowEdit = queryParams['allowEdit'] === '1' ? true : false;
+      }
+    );
+    this.route.fragment.subscribe();
+    const id = this.route.snapshot.params['id'];
+    this.server = this.serversService.getServer(+id);
+    console.log(this.server);
+    // Subscribe route params to update the id if params change
+    this.route.params.subscribe(
+      (params: Params) => {
+        this.route.params['id'] = params['id'];
+      }
+    );
+    this.serverName = this.server.name;
+    this.serverStatus = this.server.status;
+  }
+
+  onUpdateServer() {
+    this.serversService.updateServer(this.server.id, { name: this.serverName, status: this.serverStatus });
+    this.changesSaved = true;
+    this.router.navigate(['../'], { relativeTo: this.route });
+  }
+
+  canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
+    if (!this.allowEdit) {
+      return true;
+    }
+    if ((this.serverName !== this.server.name || this.serverStatus !== this.server.status) && !this.changesSaved) {
+      return confirm('Do you want to discard the changes ?');
+    }
+    else {
+      return true;
+    }
+  }
+}
+```
+- can-deactivate-guard.service.ts
+```
+import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot } from "@angular/router";
+import { Observable } from "rxjs";
+
+export interface CanComponentDeactivate {
+  canDeactivate: () => Observable<boolean> | Promise<boolean> | boolean;
+}
+
+export class CanDeactivateGuard implements CanDeactivate<CanComponentDeactivate> {
+  canDeactivate(component: CanComponentDeactivate, currentRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState?: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
+    return component.canDeactivate();
+  }
+}
+```
+- app-routing.module.ts
+```
+import { NgModule } from "@angular/core";
+import { RouterModule, Routes } from "@angular/router";
+import { AuthGuard } from "./auth-guard.service";
+
+import { HomeComponent } from "./home/home.component";
+import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
+import { CanDeactivateGuard } from "./servers/edit-server/can-deactivate-guard.service";
+import { EditServerComponent } from "./servers/edit-server/edit-server.component";
+import { ServerComponent } from "./servers/server/server.component";
+import { ServersComponent } from "./servers/servers.component";
+import { UserComponent } from "./users/user/user.component";
+import { UsersComponent } from "./users/users.component";
+
+const appRoutes: Routes = [
+  { path: '', component: HomeComponent },
+  {
+    path: 'users', component: UsersComponent, children: [
+      { path: ':id/:name', component: UserComponent },
+    ]
+  },
+  {
+    path: 'servers', canActivateChild: [AuthGuard], component: ServersComponent, children: [
+      { path: ':id', component: ServerComponent },
+      { path: ':id/edit', component: EditServerComponent, canDeactivate: [CanDeactivateGuard] },
+    ]
+  },
+  { path: 'not-found', component: PageNotFoundComponent },
+  { path: '**', redirectTo: '/not-found' },
+];
+
+
+@NgModule({
+  imports: [
+    RouterModule.forRoot(appRoutes)
+  ],
+  exports: [RouterModule]
+})
+export class AppRoutingModule {
+
+}
+```
+- app.module.ts
+```
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+import { AppComponent } from './app.component';
+import { HomeComponent } from './home/home.component';
+import { UsersComponent } from './users/users.component';
+import { ServersComponent } from './servers/servers.component';
+import { UserComponent } from './users/user/user.component';
+import { EditServerComponent } from './servers/edit-server/edit-server.component';
+import { ServerComponent } from './servers/server/server.component';
+import { ServersService } from './servers/servers.service';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { AppRoutingModule } from './app-routing.module';
+import { AuthService } from './auth.service';
+import { AuthGuard } from './auth-guard.service';
+import { CanDeactivateGuard } from './servers/edit-server/can-deactivate-guard.service';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    HomeComponent,
+    UsersComponent,
+    ServersComponent,
+    UserComponent,
+    EditServerComponent,
+    ServerComponent,
+    PageNotFoundComponent
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    AppRoutingModule
+  ],
+  providers: [ServersService, AuthService, AuthGuard, CanDeactivateGuard],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+- home.component.html
+```
+<h4>Welcome to Server Manager 4.0</h4>
+<p>Manage your Servers and Users.</p>
+<button class="btn btn-primary" (click)="onLoadServer(1)">Load Server 1</button>
+<button class="btn btn-default" (click)="onLogin()">Login</button>
+<button class="btn btn-default" (click)="onLogout()">Logout</button>
+```
+- home.component.ts
+```
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../auth.service';
+
+@Component({
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css']
+})
+export class HomeComponent implements OnInit {
+
+  constructor(private router: Router, private authService: AuthService) { }
+
+  ngOnInit() {
+  }
+
+  onLoadServer(id: number) {
+    // Complex Calculation
+    this.router.navigate(['/servers', id, 'edit'], { queryParams: { allowEdit: '1' }, fragment: 'loading' });
+  }
+
+  onLogin() {
+    this.authService.login();
+  }
+
+  onLogout() {
+    this.authService.logout();
+  }
+}
+```
+
+### 150) Passing Static Data to a Route :
+- error-page.component.html
+```
+<h4>{{ errorMessage }}</h4>
+```
+- error-page.component.ts
+```
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Data } from '@angular/router';
+
+@Component({
+  selector: 'app-error-page',
+  templateUrl: './error-page.component.html',
+  styleUrls: ['./error-page.component.css']
+})
+export class ErrorPageComponent implements OnInit {
+  errorMessage: string;
+
+  constructor(private route: ActivatedRoute) { }
+
+  ngOnInit(): void {
+    // this.errorMessage = this.route.snapshot.data['message'];
+    this.route.data.subscribe(
+      (data: Data) => {
+        this.errorMessage = data['message'];
+      }
+    );
+  }
+}
+```
+- app-routing.module.ts
+```
+import { NgModule } from "@angular/core";
+import { RouterModule, Routes } from "@angular/router";
+import { AuthGuard } from "./auth-guard.service";
+import { ErrorPageComponent } from "./error-page/error-page.component";
+
+import { HomeComponent } from "./home/home.component";
+import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
+import { CanDeactivateGuard } from "./servers/edit-server/can-deactivate-guard.service";
+import { EditServerComponent } from "./servers/edit-server/edit-server.component";
+import { ServerComponent } from "./servers/server/server.component";
+import { ServersComponent } from "./servers/servers.component";
+import { UserComponent } from "./users/user/user.component";
+import { UsersComponent } from "./users/users.component";
+
+const appRoutes: Routes = [
+  { path: '', component: HomeComponent },
+  {
+    path: 'users', component: UsersComponent, children: [
+      { path: ':id/:name', component: UserComponent },
+    ]
+  },
+  {
+    path: 'servers', canActivateChild: [AuthGuard], component: ServersComponent, children: [
+      { path: ':id', component: ServerComponent },
+      { path: ':id/edit', component: EditServerComponent, canDeactivate: [CanDeactivateGuard] },
+    ]
+  },
+  { path: 'not-found', component: ErrorPageComponent, data: { message: 'Page not found!' } },
+  { path: '**', redirectTo: '/not-found' },
+];
+
+
+@NgModule({
+  imports: [
+    RouterModule.forRoot(appRoutes)
+  ],
+  exports: [RouterModule]
+})
+export class AppRoutingModule {
+
+}
+```
+
+### 151) Resolving Dynamic Data with the resolve Guard :
+- server-resolver.service.ts
+```
+import { Injectable } from "@angular/core";
+import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from "@angular/router";
+import { Observable } from "rxjs";
+
+import { ServersService } from "../servers.service";
+
+interface Server {
+  id: number;
+  name: string;
+  status: string;
+}
+
+@Injectable()
+export class ServerResolver implements Resolve<Server> {
+  constructor(private serversService: ServersService) { }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Server> | Promise<Server> | Server {
+    return this.serversService.getServer(+route.params['id']);
+  }
+}
+```
+- app.module.ts
+```
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+import { AppComponent } from './app.component';
+import { HomeComponent } from './home/home.component';
+import { UsersComponent } from './users/users.component';
+import { ServersComponent } from './servers/servers.component';
+import { UserComponent } from './users/user/user.component';
+import { EditServerComponent } from './servers/edit-server/edit-server.component';
+import { ServerComponent } from './servers/server/server.component';
+import { ServersService } from './servers/servers.service';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { AppRoutingModule } from './app-routing.module';
+import { AuthService } from './auth.service';
+import { AuthGuard } from './auth-guard.service';
+import { CanDeactivateGuard } from './servers/edit-server/can-deactivate-guard.service';
+import { ErrorPageComponent } from './error-page/error-page.component';
+import { ServerResolver } from './servers/server/server-resolver.service';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    HomeComponent,
+    UsersComponent,
+    ServersComponent,
+    UserComponent,
+    EditServerComponent,
+    ServerComponent,
+    PageNotFoundComponent,
+    ErrorPageComponent
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    AppRoutingModule
+  ],
+  providers: [ServersService, AuthService, AuthGuard, CanDeactivateGuard, ServerResolver],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+- app-routing.module.ts
+```
+import { NgModule } from "@angular/core";
+import { RouterModule, Routes } from "@angular/router";
+import { AuthGuard } from "./auth-guard.service";
+import { ErrorPageComponent } from "./error-page/error-page.component";
+
+import { HomeComponent } from "./home/home.component";
+import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
+import { CanDeactivateGuard } from "./servers/edit-server/can-deactivate-guard.service";
+import { EditServerComponent } from "./servers/edit-server/edit-server.component";
+import { ServerResolver } from "./servers/server/server-resolver.service";
+import { ServerComponent } from "./servers/server/server.component";
+import { ServersComponent } from "./servers/servers.component";
+import { UserComponent } from "./users/user/user.component";
+import { UsersComponent } from "./users/users.component";
+
+const appRoutes: Routes = [
+  { path: '', component: HomeComponent },
+  {
+    path: 'users', component: UsersComponent, children: [
+      { path: ':id/:name', component: UserComponent },
+    ]
+  },
+  {
+    path: 'servers', canActivateChild: [AuthGuard], component: ServersComponent, children: [
+      { path: ':id', component: ServerComponent, resolve: { server: ServerResolver } },
+      { path: ':id/edit', component: EditServerComponent, canDeactivate: [CanDeactivateGuard] },
+    ]
+  },
+  { path: 'not-found', component: ErrorPageComponent, data: { message: 'Page not found!' } },
+  { path: '**', redirectTo: '/not-found' },
+];
+
+
+@NgModule({
+  imports: [
+    RouterModule.forRoot(appRoutes)
+  ],
+  exports: [RouterModule]
+})
+export class AppRoutingModule {
+
+}
+```
+- server.component.ts
+```
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Data, Params, Router } from '@angular/router';
+
+import { ServersService } from '../servers.service';
+
+@Component({
+  selector: 'app-server',
+  templateUrl: './server.component.html',
+  styleUrls: ['./server.component.css']
+})
+export class ServerComponent implements OnInit {
+  server: { id: number, name: string, status: string };
+
+  constructor(private serversService: ServersService, private route: ActivatedRoute, private router: Router) { }
+
+  ngOnInit() {
+    this.route.data.subscribe(
+      (data: Data) => {
+        this.server = data['server'];
+      }
+    );
+    // const id = +this.route.snapshot.params['id'];
+    // this.server = this.serversService.getServer(id);
+    // this.route.params.subscribe(
+    //   (params: Params) => {
+    //     this.server = this.serversService.getServer(+params['id']);
+    //   }
+    // );
+  }
+
+  onEdit() {
+    this.router.navigate(['edit'], { relativeTo: this.route, queryParamsHandling: 'preserve' });
+  }
+}
+```
+
+### 152) Understanding Location Strategies :
+- app-routing.module.ts
+```
+import { NgModule } from "@angular/core";
+import { RouterModule, Routes } from "@angular/router";
+import { AuthGuard } from "./auth-guard.service";
+import { ErrorPageComponent } from "./error-page/error-page.component";
+
+import { HomeComponent } from "./home/home.component";
+import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
+import { CanDeactivateGuard } from "./servers/edit-server/can-deactivate-guard.service";
+import { EditServerComponent } from "./servers/edit-server/edit-server.component";
+import { ServerResolver } from "./servers/server/server-resolver.service";
+import { ServerComponent } from "./servers/server/server.component";
+import { ServersComponent } from "./servers/servers.component";
+import { UserComponent } from "./users/user/user.component";
+import { UsersComponent } from "./users/users.component";
+
+const appRoutes: Routes = [
+  { path: '', component: HomeComponent },
+  {
+    path: 'users', component: UsersComponent, children: [
+      { path: ':id/:name', component: UserComponent },
+    ]
+  },
+  {
+    path: 'servers', canActivateChild: [AuthGuard], component: ServersComponent, children: [
+      { path: ':id', component: ServerComponent, resolve: { server: ServerResolver } },
+      { path: ':id/edit', component: EditServerComponent, canDeactivate: [CanDeactivateGuard] },
+    ]
+  },
+  { path: 'not-found', component: ErrorPageComponent, data: { message: 'Page not found!' } },
+  { path: '**', redirectTo: '/not-found' },
+];
+
+
+@NgModule({
+  imports: [
+    // RouterModule.forRoot(appRoutes, {useHash: true})
+    RouterModule.forRoot(appRoutes)
+  ],
+  exports: [RouterModule]
+})
+export class AppRoutingModule {
+
+}
+```
+
+### 153) Wrap Up :
